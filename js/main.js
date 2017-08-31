@@ -1,9 +1,58 @@
-$(document).ready(function() {
-	var firstDate = $('.wallet_table_row .wht_date').first().text();
-	if (moment(firstDate, "DD MMM YYYY").isValid() === false) {
-		var locale = window.navigator.userLanguage || window.navigator.language;
-		moment.locale(locale);
+var dateFormat = "DD MMM YYYY";
+
+function setupLocale() {
+	var storeLang = $('.supernav').first().text();
+	var communityLang = $('.supernav').eq(1).text();
+	if (!storeLang.includes("STORE")) {
+		if (storeLang.includes("OBCHOD")) moment.locale("cs");
+		else if (storeLang.includes("BUTIK")) moment.locale("da");
+		else if (storeLang.includes("WINKEL")) moment.locale("nl");
+		else if (storeLang.includes("KAUPPA")) moment.locale("fi");
+		else if (storeLang.includes("MAGASIN")) moment.locale("fr");
+		else if (storeLang.includes("ΚΑΤΑΣΤΗΜΑ")) moment.locale("el");
+		else if (storeLang.includes("SHOP")) moment.locale("de");
+		else if (storeLang.includes("ÁRUHÁZ")) {
+			moment.locale("hu");
+			dateFormat = "YYYY MMM DD";
+		}
+		else if (storeLang.includes("NEGOZIO")) moment.locale("it");
+		else if (storeLang.includes("ストア")) {
+			moment.locale("ja");
+			dateFormat = "YYYY MMM Do";
+		}
+		else if (storeLang.includes("상점")) {
+			moment.locale("ko");
+			dateFormat = "YYYY MMM Do";
+		}
+		else if (storeLang.includes("상점")) {
+			moment.locale("ko");
+			dateFormat = "YYYY MMM Do";
+		}
+		else if (storeLang.includes("BUTIKK")) moment.locale("nb");
+		else if (storeLang.includes("SKLEP")) moment.locale("pl");
+		else if (storeLang.includes("LOJA")) moment.locale("pt");
+		else if (storeLang.includes("МАГАЗИН")) {
+			if (communityLang.includes("СООБЩЕСТВО")) moment.locale("ru");
+			else moment.locale("bg");
+		}
+		else if (storeLang.includes("MAGAZIN")) moment.locale("ro");
+		else if (storeLang.includes("商店")){
+			moment.locale("zh-cn");
+			dateFormat = "YYYY MM DD";
+		}
+		else if (storeLang.includes("ร้านค้า")) moment.locale("th");
+		else if (storeLang.includes("MAĞAZA")) moment.locale("tr");
+		else if (storeLang.includes("КРАМНИЦЯ")) moment.locale("uk");
+		else if (storeLang.includes("КРАМНИЦЯ")) moment.locale("uk");
+		else {
+			console.log("[GRAPHER] " + "%cWarning! " + "%cGrapher didn't support this language yet. Consider using English?", "color:red;", "color:black;");
+		}
 	}
+	console.log("[GRAPHER] Using locale : " + moment.locale());
+}
+
+$(document).ready(function() {
+	setupLocale();
 	$('.page_header_ctn .page_content').append("<button class=\"btnv6_blue_hoverfade btn_medium\" type=\"button\" id=\"grapher\" style=\"float:right;padding:10px;margin-top:-35px\">Graph this</button>");
 	$('.page_header_ctn .page_content').append("<button class=\"btnv6_blue_hoverfade btn_medium\" type=\"button\" id=\"backToList\" style=\"float:left;padding:10px;margin-top:-35px; margin-left:-85px;width:70px\">&lt; Back</button>");$('.page_header_ctn .page_content').append("<select class=\"gray_bevel dyninput\" id=\"combinedRangeSelect\" style=\"float:right;margin-top:-25px;background-color:#29577e;width:100px;border:none;padding:5px\"><option>Monthly</option><option>Quarterly</option><option selected=\"true\">Yearly</option></select>");
 	$('#combinedRangeSelect').hide();
@@ -250,8 +299,8 @@ function UpdateChart(history, format) {
 
 function ShowYearly() {
 	var history = [];
-	var beginDate = moment(transactions[transactions.length - 1].date, "DD MMM, YYYY").startOf('year');
-	var toDate = moment(transactions[0].date, "DD MMM, YYYY").startOf('year');
+	var beginDate = moment(transactions[transactions.length - 1].date, dateFormat).startOf('year');
+	var toDate = moment(transactions[0].date, dateFormat).startOf('year');
 	transConfig.options.scales.xAxes[0].time.min = beginDate;
 	transConfig.options.scales.xAxes[0].time.max = toDate;
 	balanceConfig.options.scales.xAxes[0].time.min = beginDate;
@@ -259,7 +308,7 @@ function ShowYearly() {
 	transConfig.options.scales.xAxes[0].time.unit = "year";
 	balanceConfig.options.scales.xAxes[0].time.unit = "year";
 	for (var i = transactions.length - 1; i >= 0; i--) {
-		var year = moment(transactions[i].date, "DD MMM, YYYY").year();
+		var year = moment(transactions[i].date, dateFormat).year();
 		if (history[year] === undefined)
 			history[year] = {year:year,month:0,spending:0.0,income:0.0,balance:0.0};
 		if (transactions[i].change[0] === "+") {
@@ -284,8 +333,8 @@ function ShowYearly() {
 
 function ShowMonthly() {
 	var history = [];
-	var beginDate = moment(transactions[transactions.length - 1].date, "DD MMM, YYYY").startOf('month');
-	var toDate = moment(transactions[0].date, "DD MMM, YYYY").startOf('month');
+	var beginDate = moment(transactions[transactions.length - 1].date, dateFormat).startOf('month');
+	var toDate = moment(transactions[0].date, dateFormat).startOf('month');
 	transConfig.options.scales.xAxes[0].time.min = beginDate;
 	transConfig.options.scales.xAxes[0].time.max = toDate;
 	balanceConfig.options.scales.xAxes[0].time.min = beginDate;
@@ -293,8 +342,8 @@ function ShowMonthly() {
 	transConfig.options.scales.xAxes[0].time.unit = "month";
 	balanceConfig.options.scales.xAxes[0].time.unit = "month";
 	for (var i = transactions.length - 1; i >= 0; i--) {
-		var month = moment(transactions[i].date, "DD MMM, YYYY").month();
-		var year = moment(transactions[i].date, "DD MMM, YYYY").year();
+		var month = moment(transactions[i].date, dateFormat).month();
+		var year = moment(transactions[i].date, dateFormat).year();
 		var historyIndex = month + (year - beginDate.year()) * 12;
 		if (history[historyIndex] === undefined)
 			history[historyIndex] = {year:year,month:month,spending:0.0,income:0.0,balance:0.0};
@@ -321,8 +370,8 @@ function ShowMonthly() {
 
 function ShowQuarterly() {
 	var history = [];
-	var beginDate = moment(transactions[transactions.length - 1].date, "DD MMM, YYYY").startOf('quarter');
-	var toDate = moment(transactions[0].date, "DD MMM, YYYY").startOf('quarter');
+	var beginDate = moment(transactions[transactions.length - 1].date, dateFormat).startOf('quarter');
+	var toDate = moment(transactions[0].date, dateFormat).startOf('quarter');
 	transConfig.options.scales.xAxes[0].time.min = beginDate;
 	transConfig.options.scales.xAxes[0].time.max = toDate;
 	balanceConfig.options.scales.xAxes[0].time.min = beginDate;
@@ -330,8 +379,8 @@ function ShowQuarterly() {
 	transConfig.options.scales.xAxes[0].time.unit = 'quarter';
 	balanceConfig.options.scales.xAxes[0].time.unit = 'quarter';
 	for (var i = transactions.length - 1; i >= 0; i--) {
-		var quarter = moment(transactions[i].date, "DD MMM, YYYY").quarter();
-		var year = moment(transactions[i].date, "DD MMM, YYYY").year();
+		var quarter = moment(transactions[i].date, dateFormat).quarter();
+		var year = moment(transactions[i].date, dateFormat).year();
 		var historyIndex = quarter + (year - beginDate.year()) * 4;
 		if (history[historyIndex] === undefined)
 			history[historyIndex] = {year:year,month:(quarter-1)*3,spending:0.0,income:0.0,balance:0.0};
