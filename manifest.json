@@ -2,9 +2,9 @@
   "manifest_version": 2,
   "name": "Grapher for Steam",
   "description": "A browser extension to graph your steam wallet balance.",
-  "version": "0.4.170",
+  "version": "0.4.171",
   "author": "Smankusors (Antony Kurniawan)",
-  "homepage_url": "http://smankusors.16mb.com/",
+  "homepage_url": "https://github.com/Smankusors/Grapher-for-Steam",
   "icons": {
     "16" : "img/icon_16.png",
     "32" : "img/icon_32.png",
@@ -28,7 +28,6 @@
     }
   ],
   "permissions": [
-	"http://store.steampowered.com/",
-	"tabs"
+	"http://store.steampowered.com/"
   ]
 }
